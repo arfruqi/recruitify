@@ -33,7 +33,14 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
             email: widget.email,
             password: widget.password,
           );
-      // Success - AuthGate reacts to the new session automatically.
+      // Login succeeded, meaning the email IS confirmed. AuthGate (at the
+      // root) has already switched to showing the correct home screen
+      // internally - but this screen was PUSHED on top of it, so it's
+      // still hiding that change. Popping back to the first route makes
+      // the update actually visible.
+      if (mounted) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
     } catch (e) {
       setState(() {
         statusMessage = 'Not verified yet. Check your inbox, click the link, then try again.';
