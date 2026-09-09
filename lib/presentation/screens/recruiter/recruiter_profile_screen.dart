@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:recruitify/data/models/recruiter_profile.dart';
 import 'package:recruitify/presentation/providers/recruiter_profile_provider.dart';
+import 'package:recruitify/presentation/providers/auth_provider.dart';
 import 'package:recruitify/presentation/theme/app_colors.dart';
 
 class RecruiterProfileScreen extends ConsumerWidget {
@@ -17,6 +18,12 @@ class RecruiterProfileScreen extends ConsumerWidget {
         backgroundColor: accentColor,
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => ref.read(authNotifierProvider).signOut(),
+          ),
+        ],
       ),
       backgroundColor: const Color(0xFFF7F8FA),
       body: profileAsync.when(
