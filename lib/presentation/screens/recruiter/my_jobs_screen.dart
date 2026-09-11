@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:recruitify/presentation/providers/job_provider.dart';
 import 'package:recruitify/presentation/screens/recruiter/post_job_screen.dart';
+import 'package:recruitify/presentation/screens/recruiter/applicants_list_screen.dart';
 import 'package:recruitify/presentation/theme/app_colors.dart';
 
 class MyJobsScreen extends ConsumerWidget {
@@ -43,22 +44,42 @@ class MyJobsScreen extends ConsumerWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(12),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => PostJobScreen(existingJob: job)),
-                        );
-                      },
-                      title: Text(job.title, style: const TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: Text('${job.location} • ${job.jobType} • ${job.status}'),
-                      trailing: IconButton(
-                        icon: Icon(Icons.delete_outline, color: Colors.grey[500]),
-                        onPressed: () {
-                          ref.read(jobProvider.notifier).deleteJob(job.id);
-                        },
-                      ),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => PostJobScreen(existingJob: job)),
+                            );
+                          },
+                          title: Text(job.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+                          subtitle: Text('${job.location} • ${job.jobType} • ${job.status}'),
+                          trailing: IconButton(
+                            icon: Icon(Icons.delete_outline, color: Colors.grey[500]),
+                            onPressed: () {
+                              ref.read(jobProvider.notifier).deleteJob(job.id);
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ApplicantsListScreen(job: job)),
+                                );
+                              },
+                              icon: const Icon(Icons.people_outline),
+                              label: const Text('View Applicants'),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 },

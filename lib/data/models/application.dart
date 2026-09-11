@@ -5,8 +5,11 @@ class Application {
   final String resumePath;
   final double? aiScore;
   final String status;
+  final DateTime? interviewAt;
   final String? jobTitle;
   final String? jobLocation;
+  final String? candidateName;
+  final String? candidateEmail;
 
   Application({
     required this.id,
@@ -15,15 +18,16 @@ class Application {
     required this.resumePath,
     this.aiScore,
     required this.status,
+    this.interviewAt,
     this.jobTitle,
     this.jobLocation,
+    this.candidateName,
+    this.candidateEmail,
   });
 
   factory Application.fromJson(Map<String, dynamic> json) {
-    // 'jobs' shows up here only if the query asked for it via an embedded
-    // join (see fetchMyApplications) - it's the related job row, nested
-    // inside this application's json.
     final jobData = json['jobs'];
+    final profileData = json['profiles'];
     return Application(
       id: json['id'],
       jobId: json['job_id'],
@@ -31,8 +35,11 @@ class Application {
       resumePath: json['resume_url'],
       aiScore: json['ai_score'] != null ? (json['ai_score'] as num).toDouble() : null,
       status: json['status'],
+      interviewAt: json['interview_at'] != null ? DateTime.parse(json['interview_at']) : null,
       jobTitle: jobData != null ? jobData['title'] : null,
       jobLocation: jobData != null ? jobData['location'] : null,
+      candidateName: profileData != null ? profileData['full_name'] : null,
+      candidateEmail: profileData != null ? profileData['email'] : null,
     );
   }
 }
