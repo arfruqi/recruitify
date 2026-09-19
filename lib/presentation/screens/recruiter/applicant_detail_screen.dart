@@ -119,6 +119,37 @@ class _ApplicantDetailScreenState extends ConsumerState<ApplicantDetailScreen> {
             Text(widget.application.candidateName ?? 'Unknown', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             Text(widget.application.candidateEmail ?? '', style: const TextStyle(color: Colors.grey)),
             const SizedBox(height: 16),
+
+            if (widget.application.aiScore != null) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.auto_awesome, color: accentColor, size: 18),
+                        const SizedBox(width: 6),
+                        const Text('AI Match Score', style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Spacer(),
+                        Text(
+                          '${widget.application.aiScore!.toStringAsFixed(0)}%',
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: accentColor),
+                        ),
+                      ],
+                    ),
+                    if (widget.application.aiSummary != null && widget.application.aiSummary!.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(widget.application.aiSummary!, style: const TextStyle(color: Colors.black87)),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(

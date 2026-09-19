@@ -4,6 +4,7 @@ class Application {
   final String candidateId;
   final String resumePath;
   final double? aiScore;
+  final String? aiSummary;
   final String status;
   final DateTime? interviewAt;
   final String? jobTitle;
@@ -17,6 +18,7 @@ class Application {
     required this.candidateId,
     required this.resumePath,
     this.aiScore,
+    this.aiSummary,
     required this.status,
     this.interviewAt,
     this.jobTitle,
@@ -34,6 +36,7 @@ class Application {
       candidateId: json['candidate_id'],
       resumePath: json['resume_url'],
       aiScore: json['ai_score'] != null ? (json['ai_score'] as num).toDouble() : null,
+      aiSummary: json['ai_summary'],
       status: json['status'],
       interviewAt: json['interview_at'] != null ? DateTime.parse(json['interview_at']) : null,
       jobTitle: jobData != null ? jobData['title'] : null,

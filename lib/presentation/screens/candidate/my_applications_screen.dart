@@ -82,6 +82,13 @@ class MyApplicationsScreen extends ConsumerWidget {
                             style: const TextStyle(fontWeight: FontWeight.w500),
                           ),
                         ],
+                        if (app.aiSummary != null && app.aiSummary!.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            app.aiSummary!,
+                            style: const TextStyle(color: Colors.black54, fontSize: 13),
+                          ),
+                        ],
                       ],
                     ),
                   );
