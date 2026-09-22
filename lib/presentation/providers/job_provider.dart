@@ -8,9 +8,6 @@ class JobNotifier extends AsyncNotifier<List<Job>> {
     return await fetchMyJobs();
   }
 
-  // Only fetches jobs posted by the CURRENTLY LOGGED IN recruiter, not all jobs.
-  // (Candidates browsing all jobs will use a separate provider later - that
-  // one won't filter by recruiter_id, since candidates need to see everyone's jobs.)
   Future<List<Job>> fetchMyJobs() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return [];
@@ -35,7 +32,10 @@ class JobNotifier extends AsyncNotifier<List<Job>> {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) throw Exception('Not logged in');
 
-    await Supabase.instance.client.from('jobs').insert({
+    // .select().single() returns the newly created row, including its
+    // auto-generated id - needed to tell the Edge Function which job to
+    // generate interview questions for.
+    final inserted = await Supabase.instance.client.from('jobs').insert({
       'recruiter_id': user.id,
       'title': title,
       'description': description,
@@ -44,7 +44,22 @@ class JobNotifier extends AsyncNotifier<List<Job>> {
       'salary_range': salaryRange,
       'job_type': jobType,
       'status': 'open',
-    });
+    }).select().single();
+
+    final newJobId = inserted['id'];
+
+    // Generate interview questions now, once, for this job. Wrapped
+    // separately so a generation failure doesn't block the job from being
+    // posted successfully - questions can be missing without breaking the
+    // rest of the app (candidate-side screen already handles an empty list).
+    try {
+      await Supabase.instance.client.functions.invoke(
+        'generate-interview-questions',
+        body: {'jobId': newJobId},
+      );
+    } catch (_) {
+      // Job still posted even if question generation failed.
+    }
 
     state = AsyncValue.data(await fetchMyJobs());
   }

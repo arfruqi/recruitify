@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:recruitify/presentation/providers/application_provider.dart';
+import 'package:recruitify/presentation/screens/candidate/interview_screen.dart';
 import 'package:recruitify/presentation/theme/app_colors.dart';
 
 class MyApplicationsScreen extends ConsumerWidget {
@@ -15,7 +16,7 @@ class MyApplicationsScreen extends ConsumerWidget {
       case 'rejected':
         return Colors.red;
       default:
-        return Colors.grey; // 'applied'
+        return Colors.grey;
     }
   }
 
@@ -89,6 +90,20 @@ class MyApplicationsScreen extends ConsumerWidget {
                             style: const TextStyle(color: Colors.black54, fontSize: 13),
                           ),
                         ],
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => InterviewScreen(application: app)),
+                              );
+                            },
+                            icon: const Icon(Icons.quiz_outlined, size: 18),
+                            label: const Text('Answer Interview Questions'),
+                          ),
+                        ),
                       ],
                     ),
                   );

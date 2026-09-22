@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:recruitify/data/models/application.dart';
 import 'package:recruitify/presentation/providers/applicants_provider.dart';
 import 'package:recruitify/presentation/providers/applicant_actions_provider.dart';
+import 'package:recruitify/presentation/providers/interview_provider.dart';
 import 'package:recruitify/presentation/theme/app_colors.dart';
 
 class ApplicantDetailScreen extends ConsumerStatefulWidget {
@@ -35,7 +36,6 @@ class _ApplicantDetailScreenState extends ConsumerState<ApplicantDetailScreen> {
     setState(() => isUpdating = true);
     try {
       await ref.read(applicantActionsProvider).updateStatus(widget.application, newStatus);
-      // Refresh the applicants list for this job so the change shows there too.
       ref.invalidate(applicantsForJobProvider(widget.application.jobId));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -102,6 +102,8 @@ class _ApplicantDetailScreenState extends ConsumerState<ApplicantDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(candidateDetailProvider(widget.application.candidateId));
+    final questionsAsync = ref.watch(interviewQuestionsForJobProvider(widget.application.jobId));
+    final answersAsync = ref.watch(interviewAnswersForApplicationProvider(widget.application.id));
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FA),
@@ -205,6 +207,43 @@ class _ApplicantDetailScreenState extends ConsumerState<ApplicantDetailScreen> {
                 icon: const Icon(Icons.calendar_today),
                 label: const Text('Schedule Interview'),
               ),
+            ),
+            const SizedBox(height: 24),
+
+            const Text('Interview Responses', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            questionsAsync.when(
+              data: (questions) => answersAsync.when(
+                data: (answers) {
+                  if (questions.isEmpty) {
+                    return const Text('No interview questions were generated for this job.', style: TextStyle(color: Colors.grey));
+                  }
+                  if (answers.isEmpty) {
+                    return const Text('Candidate has not answered yet.', style: TextStyle(color: Colors.grey));
+                  }
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (int i = 0; i < questions.length; i++) ...[
+                        Text('Q${i + 1}. ${questions[i].questionText}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 4),
+                        Builder(builder: (context) {
+                          final matching = answers.where((a) => a.questionId == questions[i].id);
+                          final answerText = matching.isNotEmpty ? matching.first.answerText : '(not answered)';
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Text(answerText, style: const TextStyle(color: Colors.black87)),
+                          );
+                        }),
+                      ],
+                    ],
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stack) => Text('Error: $error'),
+              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stack) => Text('Error: $error'),
             ),
             const SizedBox(height: 24),
 
